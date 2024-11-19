@@ -15,7 +15,7 @@
 1. **Клонування репозиторію**  
    Відкрийте термінал та виконайте команду:  
    ```bash  
-   git clone <repository-url>  
+   git clone https://github.com/perdi0l/indplan.git
    cd <repository-folder>  
    ```  
 

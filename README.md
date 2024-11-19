@@ -17,7 +17,7 @@ Before installing the application, ensure you have the following tools installed
 1. **Clone the Repository**  
    Open a terminal and run:  
    ```bash  
-   git clone <repository-url>  
+   git clone https://github.com/perdi0l/indplan.git 
    cd <repository-folder>  
    ```  
 
