@@ -1,8 +1,10 @@
 # User Guide
 
+# [Українською](README.ua.md)
+
 ## Installation and Setup Instructions  
 
-This guide provides step-by-step instructions on installing and running the student archive application built with Python, Flask, and PostgreSQL.  
+This guide provides step-by-step instructions on installing and running the "Student's individual plans" application built with Python, Flask, and PostgreSQL.  
 
 ### Prerequisites  
 Before installing the application, ensure you have the following tools installed:  
