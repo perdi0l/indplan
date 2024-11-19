@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль студента</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #4CAF50;
+        }
+
+        .profile-container, .progress-table {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #555;
+        }
+
+        .value {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            color: #555;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0f7fa;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Профіль студента</h1>
+
+    <div class="profile-container">
+
+		<div class="profile-item">
+			{% if student.photo %}
+				<img src="{{ url_for('static', filename=student.photo) }}" alt="Фото користувача" style="width:100px;">
+			{% else %}
+				<img src="{{ url_for('static', filename='default_avatar.png') }}" alt="Фото за замовчуванням" style="width:100px;">
+			{% endif %}
+		</div>					
+
+        <h2>{{ student.last_name }} {{ student.first_name }} {{ student.patronymic }}</h2>
+        <div class="profile-item">
+            <span class="label">Ім'я в системі:</span>
+            <span class="value">{{ student.username }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Роль:</span>
+            <span class="value">{{ student.role_rel.name if student.role_rel else 'N/A' }}</span>
+        </div>
+		<div class="profile-item">
+            <span class="label">Група:</span>
+            <span class="value">{{ student.group_rel.group_cipher if student.group_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Відділення:</span>
+            <span class="value">{{ student.department_rel.department if student.department_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Область знань:</span>
+            <span class="value">{{ student.knowledge_area_rel.name if student.knowledge_area_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Спеціальність:</span>
+            <span class="value">{{ student.specialty_rel.name if student.specialty_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Спеціалізація:</span>
+            <span class="value">{{ student.specialization_rel.name if student.specialization_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Навчальна програма:</span>
+            <span class="value">{{ student.education_program_rel.name if student.education_program_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Ступінь:</span>
+            <span class="value">{{ student.education_degree_rel.name if student.education_degree_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Форма навчання:</span>
+            <span class="value">{{ student.education_form_rel.name if student.education_form_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Вступ на базі:</span>
+            <span class="value">{{ student.basis_of_admission_rel.name if student.basis_of_admission_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Зав. відділення:</span>
+            <span class="value">{{ student.department_head_rel.department_head if student.department_head_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Куратор групи:</span>
+            <span class="value">{{ student.curator_rel.name if student.curator_rel else 'N/A' }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Дата вступу:</span>
+            <span class="value">{{ student.admission_date.strftime('%Y-%m-%d') }}</span>
+        </div>
+    </div>
+
+    <div class="progress-table">
+        <h3>Прогрес студента</h3>
+
+		<form method="POST" action="{{ url_for('main.student_profile', user_id=student.id) }}">
+			<label for="semester_id">Оберіть семестр та курс:</label>
+			<select name="semester_id" id="semester_id">
+				{% for semester in semesters %}
+					<option value="{{ semester.id }}">{{ semester.name }}</option>
+				{% endfor %}
+			</select>
+			<button type="submit">Показати прогрес</button>
+		</form>
+		
+        <table>
+			<thead>
+				<tr>
+					<th>Семестр</th>
+					<th>Предмет/Дисципліна</th>
+					<th>Загальна оцінка</th>
+					<th>Оцінка ЄКТС</th>
+					<th>Кількість кредитів</th>
+					<th>Викладач</th>
+					<th>Години лекцій</th>
+					<th>Години ЛР</th>
+					<th>Години ПР</th>
+					<th>Години семінарів</th>
+					<th>Години ІР</th>
+					<th>Години саморозвитку</th>
+					<th>Форма контролю</th>
+					<th>Дата оцінювання</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for record in progress %}
+				<tr>
+					<td>{{ record.semester_id }}</td>
+					<td>{{ record.subject_rel.subject_name if record.subject_rel else 'N/A' }}</td>
+					<td>{{ record.grade }}</td>
+					<td>{{ record.grade_ects }}</td>
+					<td>{{ record.credits }}</td>
+					<td>{{ record.teacher_rel.name if record.teacher_rel else 'N/A' }}</td>
+					<td>{{ record.hours_lectures }}</td>
+					<td>{{ record.hours_labs }}</td>
+					<td>{{ record.hours_practice }}</td>
+					<td>{{ record.hours_seminars }}</td>
+					<td>{{ record.hours_individual_work }}</td>
+					<td>{{ record.hours_self_study }}</td>
+					<td>{{ record.final_control }}</td>
+					<td>{{ record.grade_date.strftime('%Y-%m-%d') if record.grade_date else 'N/A' }}</td>
+				</tr>
+				{% else %}
+				<tr>
+					<td colspan="14">Нема даних про прогрес.</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		
+    </div>
+	<script>
+        function filterSemester() {
+            const semesterSelect = document.getElementById("semesterSelect").value;
+            const rows = document.querySelectorAll("#progressTableBody tr");
+
+            rows.forEach(row => {
+                if (semesterSelect === "all" || row.dataset.semester === semesterSelect) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            if (rows.length === 0 || [...rows].every(row => row.style.display === "none")) {
+                document.querySelector(".no-data").style.display = "table-row";
+            } else {
+                document.querySelector(".no-data").style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

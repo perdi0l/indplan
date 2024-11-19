@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Адміністративна панель</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .profile-container,
+        .progress-table {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        td {
+            background-color: #fff;
+        }
+        
+        button {
+            background-color: #ff4d4d;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        button:hover {
+            background-color: #ff1a1a;
+        }
+        
+        .actions a {
+            margin-right: 8px;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Адміністративна панель</h1>
+    <a href="{{ url_for('main.add_user') }}">Додати користувача</a>
+
+
+    <h2>Студенти</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Користувач</th>
+            <th>Пароль</th>
+            <th>ПІБ</th>
+            <th>Група</th>
+            <th>Спеціальність</th>
+            <th>Куратор</th>
+            <th>Завідувач відділення</th>
+            <th>Дії</th>
+        </tr>
+        {% for user in users if user.role == 2 %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</td>
+            <td>{{ user.group_rel.group_cipher }}</td>
+            <td>{{ user.specialty_rel.name }}</td>
+            <td>{{ user.curator_rel.name }}</td>
+            <td>{{ user.department_head_rel.department_head }}</td>
+            <td>
+				<ul style="list-style-type: none; padding: 0; margin: 0;">
+					<li>
+						<a href="{{ url_for('main.edit_user', user_id=user.id) }}">Редагувати</a>
+					</li>
+					<li>
+						<a href="{{ url_for('main.create_student_progress', student_id=user.id) }}">Змінити таблицю прогресу для {{ user.first_name }}</a>
+					</li>
+					<li>
+						<a href="{{ url_for('main.student_profile', user_id=user.id) }}">Передивитись профіль</a>
+					</li>
+				</ul>
+				<form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+					<button type="submit" onclick="return confirm('Ви впевнені?')">Видалити</button>
+				</form>
+			</td>
+			
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h2>Адміністратори</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Користувач</th>
+            <th>Пароль</th>
+            <th>Роль</th>
+            <th>Дії</th>
+        </tr>
+        {% for user in users if user.role == 1 %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>Адміністратор</td>
+            <td>
+                <a href="{{ url_for('main.edit_user', user_id=user.id) }}">Редагувати</a>
+                <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Вы уверены?')">Видалити</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Викладачи/Куратори</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Користувач</th>
+            <th>Пароль</th>
+            <th>ПІБ</th>
+            <th>Роль</th>
+            <th>Дії</th>
+        </tr>
+        {% for user in users if user.role in [3, 4] %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ 'Куратор' if user.role == 4 else 'Преподаватель' }}</td>
+            <td>
+                <a href="{{ url_for('main.edit_user', user_id=user.id) }}">Редагувати</a>
+                <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Вы уверены?')">Видалити</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+	{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+	
+</body>
+
+</html>

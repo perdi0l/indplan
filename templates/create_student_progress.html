@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Створити прогрес студента</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 auto;
+            width: 95%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .progress-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            color: #555;
+            font-size: 0.9em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: #fff;
+			word-break: break-all;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0f7fa;
+        }
+
+        .remove-row {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .remove-row:hover {
+            background-color: #c82333;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+    <script>
+        function addRow() {
+            const table = document.getElementById('progress-table-body');
+            const newRow = document.createElement('tr');
+    
+            newRow.innerHTML = `
+                <td>
+                    <select name="semester_id[]" required>
+                        {% for semester in semesters %}
+                            <option value="{{ semester.id }}">{{ semester.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select name="subject_id[]" required>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><input type="number" name="grade[]" required></td>
+                <td><input type="text" name="grade_ects[]"></td>
+                <td><input type="date" name="grade_date[]"></td>
+                <td><input type="number" name="credits[]"></td>
+                <td><input type="number" name="hours_lectures[]"></td>
+                <td><input type="number" name="hours_labs[]"></td>
+                <td><input type="number" name="hours_practice[]"></td>
+                <td><input type="number" name="hours_seminars[]"></td>
+                <td><input type="number" name="hours_individual_work[]"></td>
+                <td><input type="number" name="hours_self_study[]"></td>
+                <td><input type="text" name="final_control[]"></td>
+                <td>
+                    <select name="teacher_id[]" required>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><button type="button" class="remove-row" onclick="removeRow(this)">Удалить</button></td>
+            `;
+            table.appendChild(newRow);
+        }
+
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+    </script>
+</head>
+<body>
+    <form method="GET" action="{{ url_for('main.create_student_progress', student_id=student_id) }}">
+		<label for="semester-select">Обрати семестр:</label>
+		<select id="semester-select" name="semester_id" onchange="this.form.submit()">
+			{% for semester in semesters %}
+				<option value="{{ semester.id }}" {% if semester.id == selected_semester_id %}selected{% endif %}>
+					{{ semester.name }}
+				</option>
+			{% endfor %}
+		</select>
+	</form>	
+
+    <form method="POST" action="{{ url_for('main.create_student_progress', student_id=student_id) }}">
+        <table class="progress-table">
+            <thead>
+                <tr>
+                    <th>Семестр</th>
+                    <th>Предмет</th>
+                    <th>Заг. оцінка</th>
+                    <th>ЄКТС</th>
+                    <th>Дата оцінки</th>
+                    <th>Кредити</th>
+                    <th>Год. лекцій</th>
+                    <th>Год. лабораторних</th>
+                    <th>Год. практичних</th>
+                    <th>Год. семінарів</th>
+                    <th>Інд. год.</th>
+                    <th>Год. самодідг</th>
+                    <th>Форма контролю</th>
+                    <th>Викладач</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody id="progress-table-body">
+                {% for progress in selected_semester_progress %}
+                <tr>
+                    <td>
+                        <input type="hidden" name="progress_id[]" value="{{ progress.id }}">
+                        <select name="semester_id[]" required>
+                            {% for semester in semesters %}
+                                <option value="{{ semester.id }}" {% if progress.semester_id == semester.id %}selected{% endif %}>
+                                    {{ semester.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="subject_id[]" required>
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}" {% if progress.subject_id == subject.id %}selected{% endif %}>
+                                    {{ subject.subject_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="number" name="grade[]" value="{{ progress.grade }}" required></td>
+                    <td><input type="text" name="grade_ects[]" value="{{ progress.grade_ects }}"></td>
+                    <td><input type="date" name="grade_date[]" value="{{ progress.grade_date }}"></td>
+                    <td><input type="number" name="credits[]" value="{{ progress.credits }}"></td>
+                    <td><input type="number" name="hours_lectures[]" value="{{ progress.hours_lectures }}"></td>
+                    <td><input type="number" name="hours_labs[]" value="{{ progress.hours_labs }}"></td>
+                    <td><input type="number" name="hours_practice[]" value="{{ progress.hours_practice }}"></td>
+                    <td><input type="number" name="hours_seminars[]" value="{{ progress.hours_seminars }}"></td>
+                    <td><input type="number" name="hours_individual_work[]" value="{{ progress.hours_individual_work }}"></td>
+                    <td><input type="number" name="hours_self_study[]" value="{{ progress.hours_self_study }}"></td>
+                    <td><input type="text" name="final_control[]" value="{{ progress.final_control }}"></td>
+                    <td>
+                        <select name="teacher_id[]" required>
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}" {% if progress.teacher_id == teacher.id %}selected{% endif %}>
+                                    {{ teacher.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><button type="button" class="remove-row" onclick="removeRow(this)">Видалити</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" onclick="addRow()">Додати запис</button>
+        <button type="submit">Зберегти прогрес</button>
+    </form>
+</body>
+</html>

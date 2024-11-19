@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додати користувача</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            max-width: 300px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Додати користувача</h1>
+    <form action="{{ url_for('main.add_user') }}" method="POST" enctype="multipart/form-data">
+        <h2>Інформація про користувача</h2>
+        
+		<label for="profile_image">Фото профілю:</label>
+        <input type="file" id="profile_image" name="profile_image" accept="image/*">
+
+        <label for="username">Ім'я користувача:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Пароль:</label>
+        <input type="text" id="password" name="password" required>
+
+
+        <label for="last_name">Прізвище:</label>
+        <input type="text" id="last_name" name="last_name">
+
+        <label for="first_name">Ім'я:</label>
+        <input type="text" id="first_name" name="first_name">
+
+        <label for="patronymic">По батькові:</label>
+        <input type="text" id="patronymic" name="patronymic">
+
+        <label for="role">Роль:</label>
+        <select id="role" name="role" onchange="toggleStudentFields()">
+            {% for role in roles %}
+                <option value="{{ role.id }}">{{ role.name }}</option>
+            {% endfor %}
+        </select>
+
+        <div id="student-fields" style="display: none;">
+            <h3>Інформація про студента</h3>
+            
+            <label for="curator">Куратор:</label>
+            <select id="curator" name="curator">
+                {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="group_cipher">Група:</label>
+            <select id="group_cipher" name="group_cipher">
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.group_cipher }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="department">Відділення:</label>
+            <select id="department" name="department">
+                {% for department in departments %}
+                    <option value="{{ department.id_department }}">{{ department.department }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="department_head">Завідувач відділення:</label>
+            <select id="department_head" name="department_head">
+                {% for department_head in department_heads %}
+                    <option value="{{ department_head.id_department_head }}">{{ department_head.department_head }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="knowledge_area">Галузь знань:</label>
+            <select id="knowledge_area" name="knowledge_area">
+                {% for knowledge_area in knowledge_areas %}
+                    <option value="{{ knowledge_area.id }}">{{ knowledge_area.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="specialty">Спеціальність:</label>
+            <select id="specialty" name="specialty">
+                {% for specialty in specialties %}
+                    <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="specialization">Спеціалізація:</label>
+            <select id="specialization" name="specialization">
+                {% for specialization in specializations %}
+                    <option value="{{ specialization.id }}">{{ specialization.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="education_program">Освітня програма:</label>
+            <select id="education_program" name="education_program">
+                {% for program in education_programs %}
+                    <option value="{{ program.id }}">{{ program.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="education_degree">Ступінь:</label>
+            <select id="education_degree" name="education_degree">
+                {% for degree in degrees %}
+                    <option value="{{ degree.id }}">{{ degree.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="education_form">Форма навчання:</label>
+            <select id="education_form" name="education_form">
+                {% for form in forms %}
+                    <option value="{{ form.id }}">{{ form.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="admission_date">Дата вступу:</label>
+            <input type="date" id="admission_date" name="admission_date">
+
+            <label for="basis_of_admission">Вступ на основі:</label>
+            <select id="basis_of_admission" name="basis_of_admission">
+                {% for basis in admission_bases %}
+                    <option value="{{ basis.id }}">{{ basis.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Додати користувача</button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+        function toggleStudentFields() {
+            const roleSelect = document.getElementById('role');
+            const studentFields = document.getElementById('student-fields');
+            studentFields.style.display = roleSelect.value == '2' ? 'block' : 'none';
+        }
+    </script>
+</body>
+
+</html>
