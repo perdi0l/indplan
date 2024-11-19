@@ -1,6 +1,6 @@
 # User Guide
 
-# [Українською](README.ua.md)
+## [Інструкція Українською](README.ua.md)
 
 ## Installation and Setup Instructions  
 
